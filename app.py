@@ -32,7 +32,7 @@ def extract_context(text, query):
         if re.search(query, sentence, re.IGNORECASE):
             start = max(0, i - 1)
             end = min(len(sentences), i + 2)
-            context_with_highlight = ' '.join([highlight_query(s, query) for s in sentences[start:end)])
+            context_with_highlight = ' '.join([highlight_query(s, query) for s in sentences[start:end]])
             context.append(context_with_highlight)
     return context
 
@@ -63,7 +63,7 @@ def search_site(start_url, query, max_depth=2):
             context = extract_context(page_text, query)
             if context:
                 results.append((current_url, context))
-                print(f"Найдено '{query}' на {current_url}")
+                print(f"Найдено '{query}' на {current_url}")
             for link in soup.find_all('a', href=True):
                 url = link['href']
                 full_url = urljoin(current_url, url)
@@ -78,4 +78,15 @@ def search_site(start_url, query, max_depth=2):
 def search():
     query = request.args.get('query')
     if not query:
-        return jsonify({"error": "Query parameter is requi
+        return jsonify({"error": "Query parameter is required"}), 400
+
+    start_urls = ["http://old-rozental.ru/", "http://orthographia.ru/"]
+    all_results = {}
+    for start_url in start_urls:
+        results = search_site(start_url, query)
+        all_results[start_url] = results
+
+    return jsonify(all_results)
+
+if __name__ == '__main__':
+    app.run(debug=True)
